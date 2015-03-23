@@ -1,12 +1,12 @@
-#include <glm.hpp>
-#include <WindowManager.hpp>
-#include <Renderer3D.hpp>
-#include <InputState.hpp>
+#include <Graphics/glm.hpp>
+#include <Graphics/WindowManager.hpp>
+#include <Graphics/Renderer/Deferred.hpp>
+#include <Graphics/InputState.hpp>
 #include <Particle.hpp>
 
 #include <ParticleSystem.hpp>
-#include <Shader.hpp>
-#include <MeshLoader.hpp>
+#include <Graphics/Shader.hpp>
+#include <Graphics/MeshLoader.hpp>
 
 #include "HookForce.hpp"
 #include "BrakeForce.hpp"
@@ -21,8 +21,8 @@
 #include <vector>
 
 
-static const Uint32 WINDOW_WIDTH = 1024;
-static const Uint32 WINDOW_HEIGHT = 1024;
+static const Uint32 WINDOW_WIDTH = 800;
+static const Uint32 WINDOW_HEIGHT = 600;
 
 
 
@@ -32,10 +32,10 @@ int main() {
 
     srand(0);
 
-    Renderer3D renderer;
-    Camera camera(glm::vec3(100,50,0));
-    camera.setAspect(WINDOW_WIDTH,WINDOW_HEIGHT);
-    camera.lookAt(glm::vec3(0,0,0));
+    Deferred renderer;
+    CameraPtr camera(std::make_shared<Camera>(glm::vec3(10,5,0)));
+    camera->setAspect(WINDOW_WIDTH,WINDOW_HEIGHT);
+    camera->lookAt(glm::vec3(0,0,0));
 
     ParticleSystem sys;
 
@@ -48,28 +48,28 @@ int main() {
     Entity entity;
 
     Model3DBufferPtr quadBuffer(Model3DBuffer::axis(glm::vec3(0,0,0), glm::vec3(1,1,1)));
-    Model3Dptr axis(new Model3D);
+    Model3DPtr axis(new Model3D);
     axis->addModelBuffer(quadBuffer);
     axis->setPosition(glm::vec3(0,0,0));
     axis->setShader(&shader);
-    renderer.addModel(axis);
+    renderer.registerModel(axis);
     
     Model3DBufferPtr mapBuffer(new Model3DBuffer);
     VertexBuffer vBuffer;
-    vBuffer.addVertex(glm::vec3(-Map::width/2, 0, Map::height/2), glm::vec3(0,0,0), glm::vec2(0,0), glm::vec4(0,0.5,0,1));
-    vBuffer.addVertex(glm::vec3(Map::width/2, 0, Map::height/2), glm::vec3(0,0,0), glm::vec2(0,0), glm::vec4(0,0.5,0,1));
-    vBuffer.addVertex(glm::vec3(Map::width/2, 0, -Map::height/2), glm::vec3(0,0,0), glm::vec2(0,0), glm::vec4(0,0.5,0,1));
-    vBuffer.addVertex(glm::vec3(-Map::width/2, 0, -Map::height/2), glm::vec3(0,0,0), glm::vec2(0,0), glm::vec4(0,0.5,0,1));
+    vBuffer.addVertex(glm::vec3(-Map::width/2, 0, Map::height/2), glm::vec3(0,1,0), glm::vec2(0,0), glm::vec4(0,0.5,0,1));
+    vBuffer.addVertex(glm::vec3(Map::width/2, 0, Map::height/2), glm::vec3(0,1,0), glm::vec2(0,0), glm::vec4(0,0.5,0,1));
+    vBuffer.addVertex(glm::vec3(Map::width/2, 0, -Map::height/2), glm::vec3(0,1,0), glm::vec2(0,0), glm::vec4(0,0.5,0,1));
+    vBuffer.addVertex(glm::vec3(-Map::width/2, 0, -Map::height/2), glm::vec3(0,1,0), glm::vec2(0,0), glm::vec4(0,0.5,0,1));
 
     vBuffer.addTriangle(0,1,2);
-    vBuffer.addTriangle(3,2,0);
+    vBuffer.addTriangle(0,2,3);
 
-    Model3Dptr map(new Model3D);
+    Model3DPtr map(new Model3D);
     mapBuffer->loadFromMemory(vBuffer);
     map->addModelBuffer(mapBuffer);
     map->setPosition(glm::vec3(0,0,0));
     map->setShader(&shader);
-    renderer.addModel(map);
+    renderer.registerModel(map);
 
     for(int i = 0; i < 3; ++i){
         std::shared_ptr<Sheep> s(new Sheep);
@@ -80,7 +80,7 @@ int main() {
         s->setRotation(glm::vec3(180,0,0));
         s->setScale(glm::vec3(0.5, 1,0.5));
 
-        renderer.addModel(s->getModel());
+        renderer.registerModel(s->getModel());
         sys.addParticle(s);
         entity.sheeps.push_back(s);
     }
@@ -91,10 +91,10 @@ int main() {
         w->getModel()->setShader(&shader);
         MeshLoader::load(w->getModel().get(), "../Resources/WOLF.3DS");
         
-        w->setPosition(glm::vec3(glm::linearRand(-10.f, 10.f),0,glm::linearRand(-10.f, 10.f)));
+        w->setPosition(glm::vec3(0,0,0));//glm::vec3(glm::linearRand(-10.f, 10.f),0,glm::linearRand(-10.f, 10.f)));
         w->setRotation(glm::vec3(-90,0,0));
         
-        renderer.addModel(w->getModel());
+        renderer.registerModel(w->getModel());
         sys.addParticle(w);
         entity.wolves.push_back(w);
     }
@@ -111,8 +111,27 @@ int main() {
     for(auto& s : entity.sheeps)
         s->setBehavior(&behav2);
 
+    LightPtr directional(std::make_shared<DirectionalLight>());
+    directional->position = glm::vec3(-100,200,0);
+    directional->color = glm::vec3(1,1,1);
+    directional->intensity = 1.f;
+    renderer.registerLight(directional);
 
-    renderer.setCamera(&camera);
+    /*LightPtr point(std::make_shared<PointLight>());
+    point->position = glm::vec3(0,10,0);
+    point->color = glm::vec3(1,1,1);
+    point->intensity = 10.f;
+    renderer.registerLight(point);
+    */
+
+    LightPtr point(std::make_shared<SpotLight>(glm::vec3(0,5,1),60.f,70.f));
+    point->position = glm::vec3(0,-5,-1);
+    point->color = glm::vec3(1,1,1);
+    point->intensity = 30.f;
+    renderer.registerLight(point);
+    
+
+    renderer.setCamera(camera);
 
     InputState::get().setWindow(&wm);
     InputState::get().update();
@@ -125,8 +144,7 @@ int main() {
         wm.startMainLoop();
 
         // Rendu
-        renderer.clear();
-        renderer.draw();
+        renderer.renderFrame();
 
 
         // Gestion des evenements
@@ -150,17 +168,17 @@ int main() {
         if(InputState::get().isKeyPressed(SDLK_ESCAPE))
             done = true;
 
-        camera.update(dt);
-        sys.update(dt);
+        camera->update(dt);
+        /*sys.update(dt);
         for(auto& s : entity.sheeps)
             s->update(dt);
         for(auto& w : entity.wolves)
             w->update(dt);
-
+*/
         for(auto it = entity.sheeps.begin(); it < entity.sheeps.end(); ++it){
             if((*it)->getLife() < 0){
                 sys.removeParticle(*it);
-                renderer.removeModel((*it)->getModel());
+                renderer.unregisterModel((*it)->getModel());
                 it = entity.sheeps.erase(it);
             }
 

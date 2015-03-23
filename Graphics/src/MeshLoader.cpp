@@ -3,16 +3,16 @@
 #include <assimp/postprocess.h>
 #include <assimp/Importer.hpp>
 
-#include "MeshLoader.hpp"
-#include "Model3D.hpp"
-#include "Model3DBuffer.hpp"
+#include <Graphics/MeshLoader.hpp>
+#include <Graphics/Model3D.hpp>
+#include <Graphics/Model3DBuffer.hpp>
 
 namespace MeshLoader {
 
 bool load(Model3D* ptr, const std::string& file)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(file.c_str(), aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
+    const aiScene* scene = importer.ReadFile(file.c_str(), 0);
     if(!scene) {
         std::cout << importer.GetErrorString() << std::endl;
         return false;

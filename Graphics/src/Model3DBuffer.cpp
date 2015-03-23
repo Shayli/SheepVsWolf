@@ -1,9 +1,10 @@
-#include "Model3DBuffer.hpp"
+#include <Graphics/Model3DBuffer.hpp>
 #include <iostream>
 
 void Model3DBuffer::draw(){
 	vao.bind();
 	ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glDrawElements(GL_TRIANGLES, vBuffer.getTrianglesCount()*3, GL_UNSIGNED_SHORT, (void*)0);
 	ibo.unbind(GL_ELEMENT_ARRAY_BUFFER);
 	vao.unbind();

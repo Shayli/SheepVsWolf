@@ -1,8 +1,8 @@
 #pragma once
 
-#include "VertexBuffer.hpp"
-#include "VAO.hpp"
-#include "VBO.hpp"
+#include <Graphics/VertexBuffer.hpp>
+#include <Graphics/VAO.hpp>
+#include <Graphics/VBO.hpp>
 
 #include <memory>
 

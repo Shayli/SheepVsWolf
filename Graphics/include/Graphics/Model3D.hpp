@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Model3DBuffer.hpp"
-#include "Shader.hpp"
+#include <Graphics/Model3DBuffer.hpp>
+#include <Graphics/Shader.hpp>
 
 #include <memory>
 
@@ -29,4 +29,4 @@ public:
 	glm::vec3 getPosition() const;
 };
 
-typedef std::shared_ptr<Model3D> Model3Dptr;
+typedef std::shared_ptr<Model3D> Model3DPtr;

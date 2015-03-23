@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Model3D.hpp"
+#include <Graphics/Model3D.hpp>
 
 namespace MeshLoader {
 	bool load(Model3D* ptr, const std::string& filename);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm.hpp"
-#include "Model3D.hpp"
+#include <Graphics/Model3D.hpp>
 
 class Particle
 {
@@ -23,13 +23,13 @@ public:
 	void setRotation(const glm::vec3& r);
 	void setScale(const glm::vec3& s);
 
-	Model3Dptr getModel() const;
-	void setModel(const Model3Dptr& m);
+	Model3DPtr getModel() const;
+	void setModel(const Model3DPtr& m);
 
 	void update(float dt);
 	
 protected:
-	Model3Dptr m_model;
+	Model3DPtr m_model;
 	glm::vec3 m_velocity;
 	glm::vec3 m_force;
 	float m_mass;

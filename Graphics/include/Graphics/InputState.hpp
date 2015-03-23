@@ -2,8 +2,9 @@
 
 #include <SDL2/SDL.h>
 #include <map>
+#include <iostream>
 
-#include "WindowManager.hpp"
+#include <Graphics/WindowManager.hpp>
 
 struct KeyState {
 	bool pressed;
@@ -35,11 +36,13 @@ public:
 	}
 
 	void update(){
-		int x, y;
-		if(window)
-			window->lockMouse(true);
+		int x, y;	
+		//std::cout << "before: " << mousePosition << std::endl;
+		//if(window)
+		//	window->lockMouse(true);
 		SDL_GetMouseState(&x,&y);
 		mousePosition = glm::vec2(x,y);
+		//std::cout << "after: " << mousePosition << std::endl;
 	}
 
 	static InputState& get(){

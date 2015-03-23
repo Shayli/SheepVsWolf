@@ -1,6 +1,7 @@
 #pragma once
 
-#include "glm.hpp"
+#include <Graphics/glm.hpp>
+#include <memory>
 
 class Camera{
 public:
@@ -20,6 +21,7 @@ public:
 
 	glm::mat4 getProjMatrix() const;
 	glm::mat4 getViewMatrix() const;
+	glm::vec3 getPosition() const;
 
 	glm::vec3 forward();
 	glm::vec3 backward();
@@ -52,3 +54,5 @@ protected:
 private:
 	float m_moveSpeed, m_rotateSpeed;
 };
+
+typedef std::shared_ptr<Camera> CameraPtr;

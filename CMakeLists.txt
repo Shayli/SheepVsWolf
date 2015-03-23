@@ -14,11 +14,12 @@ find_package(Assimp REQUIRED)
 # Pour gérer un bug a la fac, a supprimer sur machine perso:
 #set(OPENGL_LIBRARIES /usr/lib/x86_64-linux-gnu/libGL.so.1)
 
-include_directories(${SDL_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIR} Physics/include third-party/include)
+include_directories(${SDL_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIR} Physics/include third-party/include Graphics/include)
 
 add_subdirectory(Physics)
+add_subdirectory(Graphics)
 
-set(ALL_LIBRARIES Physics ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} assimp)
+set(ALL_LIBRARIES Physics Graphics ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} assimp)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 

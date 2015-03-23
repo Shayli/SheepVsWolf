@@ -22,7 +22,7 @@ out block
 void main(){
 	Out.Color = color;
 	Out.Position = modelMatrix*vec4(position, 1.0);
-	Out.Normal = modelMatrix*normalize(vec4(normal,1));
+	Out.Normal = normalMatrix*normalize(vec4(normal,1));
 	Out.TexCoord = uv;
 	gl_Position =  mvpMatrix*vec4(position,1);
 }

@@ -1,7 +1,8 @@
-#include "Shader.hpp"
+#include <Graphics/Shader.hpp>
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 Shader::Shader(){
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -31,9 +32,6 @@ bool Shader::loadFromFile(const std::string& vertex, const std::string& fragment
 	const char* vertSourceBuffer = vertexSource.c_str();
 	glShaderSource(vertexShader, 1, &vertSourceBuffer, 0);
 
-
-	std::cout << vertexSource << std::endl;
-	
 	std::ifstream fragFile(fragment);
 	if(!fragFile.is_open())
 		return false;
@@ -47,7 +45,6 @@ bool Shader::loadFromFile(const std::string& vertex, const std::string& fragment
 
 	const char* fragSourceBuffer = fragmentSource.c_str();
 	glShaderSource(fragmentShader, 1, &fragSourceBuffer, 0);
-	std::cout << "fragment: " << fragmentSource << std::endl;
 	return true;
 }
 bool Shader::compile(){

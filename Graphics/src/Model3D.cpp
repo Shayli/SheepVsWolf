@@ -1,4 +1,4 @@
-#include "Model3D.hpp"
+#include <Graphics/Model3D.hpp>
 
 Model3D::Model3D() :
 	shader(nullptr),

@@ -1,4 +1,4 @@
-#include "WindowManager.hpp"
+#include <Graphics/WindowManager.hpp>
 
 #include <GL/glew.h>
 #include <iostream>

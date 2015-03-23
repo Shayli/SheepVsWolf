@@ -39,10 +39,10 @@ void Particle::setScale(const glm::vec3& s){
 }
 
 
-Model3Dptr Particle::getModel() const{
+Model3DPtr Particle::getModel() const{
 	return m_model;
 }
-void Particle::setModel(const Model3Dptr& m){
+void Particle::setModel(const Model3DPtr& m){
 	m_model = m;
 }
 

@@ -1,4 +1,4 @@
-#include "GLtools.hpp"
+#include <Graphics/GLtools.hpp>
 
 #include <iostream>
 

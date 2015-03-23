@@ -1,5 +1,5 @@
-#include "Camera.hpp"
-#include "InputState.hpp"
+#include <Graphics/Camera.hpp>
+#include <Graphics/InputState.hpp>
 
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -11,11 +11,11 @@ Camera::Camera(const glm::vec3& pos) :
 	m_pos(pos),
 	m_projDirty(true), m_viewDirty(true),
 	m_fov(45),
-	m_near(.1f), m_far(10000.f),
+	m_near(.1f), m_far(1000.f),
 	m_width(1), m_height(1),
 	m_forward(absoluteForward()), m_left(absoluteLeft()), m_up(absoluteUp()),
 	m_rotations(0,0,0), m_target(0,0,0),
-	m_moveSpeed(1), m_rotateSpeed(1)
+	m_moveSpeed(1), m_rotateSpeed(2)
 {
 	lookAt(pos+m_forward);
 }
@@ -82,6 +82,10 @@ glm::mat4 Camera::getViewMatrix() const {
 	return m_view;
 }
 
+glm::vec3 Camera::getPosition() const {
+	return m_pos;
+}
+
 void Camera::updateProjectionMatrix()
 {
 	m_proj = glm::perspective(m_fov, m_width/m_height, m_near, m_far);
@@ -146,7 +150,7 @@ void Camera::onUpdate(float elapsed){
 		mv -= m_left*elapsed*m_moveSpeed;
 
 	auto mz = InputState::get().getMouseDelta();
-
+	
 	rotate(mz.x*elapsed, mz.y*elapsed);
 
 	move(mv);

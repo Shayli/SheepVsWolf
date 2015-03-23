@@ -5,7 +5,10 @@
 #include <iostream>
 
 typedef enum {
-	UniformType_Mat4
+	UniformType_Mat4,
+	UniformType_Vec3,
+	UniformType_Float,
+	UniformType_Integer
 } UniformType;
 
 class Shader{
@@ -23,14 +26,24 @@ public:
 	void unbind();
 
 	template<typename T>
-	void send(UniformType type, const std::string& location, const T& t) {
+	void send(UniformType type, const std::string& location, const T& u) {
+		T& t = const_cast<T&>(u);
 		int loc = glGetUniformLocation(programId, location.c_str());
 		if(loc == -1) {
 			return;
 		}
 		switch(type) {
 		case UniformType_Mat4:
-			glUniformMatrix4fv(loc, 1, GL_FALSE, (GLfloat*)t);
+			glUniformMatrix4fv(loc, 1, GL_FALSE, *reinterpret_cast<GLfloat**>(&t));
+			break;
+		case UniformType_Vec3:
+			glUniform3fv(loc, 1, *reinterpret_cast<GLfloat**>(&t));
+			break;
+		case UniformType_Float:
+			glUniform1f(loc, *reinterpret_cast<GLfloat*>(&t));
+			break;
+		case UniformType_Integer:
+			glUniform1i(loc, *reinterpret_cast<GLint*>(&t));
 			break;
 		default:
 			break;
