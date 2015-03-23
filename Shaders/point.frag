@@ -28,6 +28,6 @@ void main(void)
 	float d = max(length(Light.Position-p), 1.0);
 	float ndotl = clamp(dot(n, l),0,1);
 
-	vec3 color = Light.Color * ndotl*1/(d*d) * Light.Intensity;
+	vec3 color = Light.Color * ndotl * Light.Intensity;
 	FragColor = vec4(clamp(color,0,1),1);
 }

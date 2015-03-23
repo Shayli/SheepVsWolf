@@ -16,6 +16,8 @@ public:
 	void draw();
 	void load(const std::string& file);
 	void loadFromMemory(const VertexBuffer& buffer);
+	VertexBuffer& getVertexBuffer();
+	void refreshIndices();
 	
 
 	static std::shared_ptr<Model3DBuffer> axis(const glm::vec3& center, const glm::vec3& size);

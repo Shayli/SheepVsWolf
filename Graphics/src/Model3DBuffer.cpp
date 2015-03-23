@@ -5,9 +5,10 @@ void Model3DBuffer::draw(){
 	vao.bind();
 	ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	glDrawElements(GL_TRIANGLES, vBuffer.getTrianglesCount()*3, GL_UNSIGNED_SHORT, (void*)0);
+	glDrawElements(GL_TRIANGLES, vBuffer.getTrianglesCount()*3, GL_UNSIGNED_INT, (void*)0);
 	ibo.unbind(GL_ELEMENT_ARRAY_BUFFER);
 	vao.unbind();
+	//std::cout << "vertices: " << vBuffer.getVerticesCount() << std::endl << "triangles: " << vBuffer.getTrianglesCount() << std::endl;
 }
 
 std::shared_ptr<Model3DBuffer> Model3DBuffer::axis(const glm::vec3& center, const glm::vec3& size){
@@ -59,7 +60,18 @@ void Model3DBuffer::loadFromMemory(const VertexBuffer& buffer){
 	vbo.unbind();
 	vao.unbind();
 
+	refreshIndices();
+	//std::cout << "vertices: " << vBuffer.getVerticesCount() << std::endl << "triangles: " << vBuffer.getTrianglesCount() << std::endl;
+}
+
+VertexBuffer& Model3DBuffer::getVertexBuffer()
+{
+	return vBuffer;
+}
+
+void Model3DBuffer::refreshIndices()
+{
 	ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vBuffer.getTrianglesCount() * sizeof(unsigned short)*3, vBuffer.getTriangles(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, vBuffer.getTrianglesCount() * sizeof(uint32_t)*3, vBuffer.getTriangles(), GL_STATIC_DRAW);
 	ibo.unbind(GL_ELEMENT_ARRAY_BUFFER);
 }

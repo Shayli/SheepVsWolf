@@ -55,17 +55,10 @@ vec4 spotLight()
 {
 	// Read gbuffer values
 	//vec4 colorBuffer = texture(ColorBuffer, In.Texcoord).rgba;
-	vec4 normalBuffer = texture(TextureChannel0, In.TexCoord).rgba;
-	float depth = texture(TextureChannel2, In.TexCoord).r;
-	// Convert texture coordinates into screen space coordinates
-	vec2 xy = In.TexCoord * 2.0 -1.0;
-	// Convert depth to -1,1 range and multiply the point by ScreenToWorld matrix
-	vec4 wP = vec4(xy, depth * 2.0 -1.0, 1.0) * ScreenToWorld;
-	// Divide by w
-	vec3 pos = vec3(wP.xyz / wP.w);
 
 	// Unpack values stored in the gbuffer
-	vec3 n = normalBuffer.rgb;
+	vec3 n = texture(TextureChannel0, In.TexCoord).rgb;
+	vec3 pos = texture(TextureChannel1, In.TexCoord).rgb;
 
 
 	float d = max(length(Position-pos), 1.0);
@@ -79,12 +72,13 @@ vec4 spotLight()
 	vec3 dir = normalize(Direction);
 	float angle = acos(dot(dir,-l))*180/M_PI;
 	float falloff = 0;
-	//if(angle < half)
+	if(angle < 10)
 	//{
-		falloff = pow((cos(angle*DEG2RAD)-cos(Angle*DEG2RAD))/(cos(15*DEG2RAD) -cos(Angle*DEG2RAD)),4);
+		falloff = 1;
+		//falloff = pow((cos(angle*DEG2RAD)-cos(Angle*DEG2RAD))/(cos(15*DEG2RAD) -cos(Angle*DEG2RAD)),4);
 	//}
 
-	vec4 color = vec4(Color,1) * falloff * ndotl*1/(d*d) * Intensity;
+	vec4 color = vec4(Color,1) * falloff * Intensity;// * ndotl * Intensity;
 	return vec4(clamp(color,0,1));
 }
 

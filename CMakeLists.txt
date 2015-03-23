@@ -19,7 +19,7 @@ include_directories(${SDL_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIR}
 add_subdirectory(Physics)
 add_subdirectory(Graphics)
 
-set(ALL_LIBRARIES Physics Graphics ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} assimp)
+set(ALL_LIBRARIES Physics Graphics ${SDL2_LIBRARY} SDL_image jpeg ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} assimp)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 

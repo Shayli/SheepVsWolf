@@ -1,4 +1,5 @@
 #include <Graphics/Renderer/Deferred.hpp>
+#include <sstream>
 
 static const uint32_t SHADOW_RES = 1024;
 
@@ -34,7 +35,7 @@ Deferred::Deferred() : width(1), height(1)
 void Deferred::renderFrame()
 {
 	geometryPass();
-	//shadowPass();
+	shadowPass();
 	lightPass();
     postFXPass();
 
@@ -52,7 +53,7 @@ void Deferred::renderFrame()
 		glActiveTexture(GL_TEXTURE0);
         float subSize = 9.f;
         int subCount = 0;
-        glBindTexture(GL_TEXTURE_2D, frameBuffer.getChannel(FBOChannel_Position));
+        glBindTexture(GL_TEXTURE_2D, frameBuffer.getChannel(FBOChannel_Albedo));
         glViewport( 0, 0, width/subSize, height/subSize);
         screenQuad.draw();
 
@@ -109,6 +110,7 @@ void Deferred::geometryPass()
 	frameBuffer.bind();
     // Default states
     glViewport(0,0,width, height);
+    glClearColor(0,0,0,0);//30/255.f, 128/255.f, 204/255.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -125,7 +127,7 @@ void Deferred::geometryPass()
     {
     	glm::mat4 objectToWorld = m->getModelMatrix();
         glm::mat4 mv = worldToView * objectToWorld;
-        glm::mat4 normalMatrix = glm::transpose(glm::inverse(mv));
+        glm::mat4 normalMatrix = m->getNormalMatrix();
     	glm::mat4 mvp = projection * mv;
 
     	if(current != m->getShader())
@@ -137,10 +139,22 @@ void Deferred::geometryPass()
 			current->send(UniformType_Mat4, "projMatrix", glm::value_ptr(projection));
     		current->send(UniformType_Mat4, "viewMatrix", glm::value_ptr(worldToView));
     	}
+
     	current->send(UniformType_Mat4, "modelMatrix", glm::value_ptr(objectToWorld));
         current->send(UniformType_Mat4, "normalMatrix", glm::value_ptr(normalMatrix));
     	current->send(UniformType_Mat4, "mvpMatrix", glm::value_ptr(mvp));
 
+        auto& mat = m->getMaterials();
+        for(int i = 0; i<TextureChannel_Max; ++i)
+        {
+            if(!mat[i])
+                continue;
+            glActiveTexture(GL_TEXTURE0+i);
+            glBindTexture(GL_TEXTURE_2D, mat[i]->getId());
+            std::ostringstream oss;
+            oss << "TextureChannel" << i;
+            current->send(UniformType_Integer, oss.str(), i);
+        }
     	m->draw();
     	//std::cout << mvp << std::endl;
     }
@@ -164,6 +178,7 @@ void Deferred::shadowPass()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+    glDisable(GL_BLEND);
 
     shadow.bind();
     shadow.send(UniformType_Mat4, "projMatrix", glm::value_ptr(projection));
@@ -213,15 +228,8 @@ void Deferred::lightPass()
 
     directional.bind();
     directional.send(UniformType_Integer, "TextureChannel0", 0);
-    directional.send(UniformType_Integer, "TextureChannel1", 1);
-    directional.send(UniformType_Integer, "TextureChannel2", 2);
-    directional.send(UniformType_Integer, "TextureChannel3", 3);
     for(auto& m: m_lights[LightType_Directional])
     {
-        glm::mat4 worldToLight = glm::lookAt(m->position, glm::vec3(0,0,0), glm::vec3(0,1,0));
-        glm::mat4 worldToLightScreen = projection * worldToLight;
-        directional.send(UniformType_Mat4, "WorldToLightScreen", glm::value_ptr(worldToLightScreen));
-        directional.send(UniformType_Mat4, "ScreenToWorld", glm::value_ptr(screenToWorld));
         directional.send(UniformType_Vec3, "Light.Direction", glm::value_ptr(m->position));
         directional.send(UniformType_Vec3, "Light.Color", glm::value_ptr(m->color));
         directional.send(UniformType_Float, "Light.Intensity", m->intensity);

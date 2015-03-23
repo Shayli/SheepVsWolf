@@ -1,6 +1,8 @@
 #include <Graphics/WindowManager.hpp>
 
 #include <GL/glew.h>
+#include <SDL/SDL_image.h>
+
 #include <iostream>
 #include <stdexcept>
 
@@ -16,6 +18,7 @@ WindowManager::WindowManager(uint32_t w, uint32_t h, const char *title) : m_widt
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GLContext glcontext = SDL_GL_CreateContext(m_window);
+    IMG_Init(IMG_INIT_PNG);
     /*
     if(!SDL_SetVideoMode(w, h, 32, SDL_OPENGL)) {
         throw std::runtime_error("Unable to open a window");

@@ -9,10 +9,10 @@
 
 namespace MeshLoader {
 
-bool load(Model3D* ptr, const std::string& file)
+bool load(Model3D* ptr, const std::string& file, const MeshParams& params)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(file.c_str(), 0);
+    const aiScene* scene = importer.ReadFile(file.c_str(), aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
     if(!scene) {
         std::cout << importer.GetErrorString() << std::endl;
         return false;
@@ -37,8 +37,8 @@ bool load(Model3D* ptr, const std::string& file)
                 aiVector3D normaltmp = m->mNormals[face.mIndices[j]];
                 glm::vec3 normal(normaltmp.x, normaltmp.y, normaltmp.z);
                 aiVector3D postmp = m->mVertices[face.mIndices[j]];
-                glm::vec3 pos(postmp.x, postmp.y, postmp.z);
-                vbuffer.addVertex(pos, normal, uv, {1,1,1,1});
+                glm::vec3 pos(postmp.x*params.scale.x, postmp.y*params.scale.y, postmp.z*params.scale.z);
+                vbuffer.addVertex(pos, normal, uv, params.color);
             }
             vbuffer.addTriangle(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
         }

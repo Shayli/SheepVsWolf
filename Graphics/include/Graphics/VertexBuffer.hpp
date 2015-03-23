@@ -1,6 +1,7 @@
 #pragma once 
 #include <Graphics/glm.hpp>
 #include <vector>
+#include <cstdint>
 
 struct Vertex{
 	glm::vec3 position;
@@ -11,7 +12,9 @@ struct Vertex{
 };
 
 struct Triangle {
-	unsigned short v1, v2, v3;
+	uint32_t v1, v2, v3;
+	Triangle() : Triangle(0,0,0) {}
+	Triangle(uint32_t a, uint32_t b, uint32_t c) : v1(a), v2(b), v3(c) {}
 };
 
 class VertexBuffer{
@@ -24,7 +27,7 @@ public:
 		vertexList.push_back({position, normal, uv, color});
 	}
 
-	void addTriangle(unsigned short v1, unsigned short v2, unsigned short v3){
+	void addTriangle(uint32_t v1, uint32_t v2, uint32_t v3){
 		triangleList.push_back({v1, v2, v3});
 	}
 
@@ -42,5 +45,24 @@ public:
 
 	Triangle* getTriangles(){
 		return triangleList.data();
+	}
+
+	std::vector<Vertex>& getVerticesArray() {
+		return vertexList;
+	}
+
+	std::vector<Triangle>& getTrianglesArray() {
+		return triangleList;
+	}
+
+	Vertex& getVertex(uint32_t id)
+	{
+		return vertexList[id];
+	}
+
+	void clear()
+	{
+		triangleList.clear();
+		vertexList.clear();
 	}
 };
