@@ -30,6 +30,8 @@ public:
 	void update(float dt){
 		if(m_behav)
 			m_behav->update(*this, dt);
+		if(glm::length(m_velocity) > m_moveSpeed)
+			m_velocity = glm::normalize(m_velocity)*m_moveSpeed;
 	}
 
 	void setBehavior(Behavior* b){
