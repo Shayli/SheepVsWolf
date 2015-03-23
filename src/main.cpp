@@ -14,6 +14,7 @@
 #include "HookForce.hpp"
 #include "BrakeForce.hpp"
 #include "ChaseForce.hpp"
+#include "MapForce.hpp"
 #include "Sheep.hpp"
 #include "Wolf.hpp"
 #include "Behavior/WolfIdleBehavior.hpp"
@@ -187,10 +188,15 @@ int main() {
         entity.wolves.push_back(w);
     }
 
-    /*for(auto s : sheeps){
-        ForcePtr f(new ChaseForce(wolves[0], s, 100));
+    for(auto s : entity.sheeps){
+        ForcePtr f(new MapForce(s));
         sys.addForce(f);
-    }*/
+    }
+
+    for(auto w : entity.wolves){
+        ForcePtr f(new MapForce(w));
+        sys.addForce(f);
+    }
 
     WolfIdleBehavior behav(entity);
     entity.wolves[0]->setBehavior(&behav);

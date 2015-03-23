@@ -28,18 +28,4 @@ void SheepIdleBehavior::update(Animal& a, float dt){
 		a.setLife(a.getLife()-1);
 		std::cout << "Life : " << a.getLife() << std::endl;
 	}
-
-	glm::vec3 pos = a.getPosition();
-	if(pos.x > Map::width/2){
-        a.setPosition(glm::vec3(Map::width/2, pos.y, pos.z));
-    }
-    if(pos.x < -Map::width/2){
-        a.setPosition(glm::vec3(-Map::width/2, pos.y, pos.z));
-    }
-    if(pos.z > Map::height/2){
-        a.setPosition(glm::vec3(pos.x, pos.y, Map::height/2));
-    }
-    if(pos.z < -Map::height/2){
-        a.setPosition(glm::vec3(pos.x, pos.y, -Map::height/2));
-    }
 }
