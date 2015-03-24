@@ -2,6 +2,7 @@
 
 in block
 {
+	vec4 Normal;
     vec2 Texcoord;
 } In;
 
@@ -13,8 +14,8 @@ layout(location = 3) out vec4 Depth;
 void main(void)
 {
     Color = vec4(30/255.0, 128/255.0, 204/255.00, 1.0);
-    Normal = vec4(1,1,1,0);
+    Normal = In.Normal;
     Position = vec4(0,0,0,0);
-    Depth = vec4(999.f,999.f,999.f,1);
-    gl_FragDepth = 999.f;
+    Depth = vec4(1,1,1,1);
+    gl_FragDepth = 0.9999999f;
 }

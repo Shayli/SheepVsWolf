@@ -4,8 +4,12 @@
 void Model3DBuffer::draw(){
 	vao.bind();
 	ibo.bind(GL_ELEMENT_ARRAY_BUFFER);
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	if(!wireframe)
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	else
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	glDrawElements(GL_TRIANGLES, vBuffer.getTrianglesCount()*3, GL_UNSIGNED_INT, (void*)0);
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	ibo.unbind(GL_ELEMENT_ARRAY_BUFFER);
 	vao.unbind();
 	//std::cout << "vertices: " << vBuffer.getVerticesCount() << std::endl << "triangles: " << vBuffer.getTrianglesCount() << std::endl;

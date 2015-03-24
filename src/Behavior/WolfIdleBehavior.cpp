@@ -37,7 +37,7 @@ void WolfIdleBehavior::update(Animal& a, float dt){
         }*/
 //        a.setDirection(dir);
 		//a.addForce(glm::normalize(dir));
-        std::cout << a.getPosition()<< std::endl;
+        //std::cout << a.getPosition()<< std::endl;
 	}
 
 }

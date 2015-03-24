@@ -12,6 +12,7 @@
 
 
 #include "HookForce.hpp"
+#include "PointHookForce.hpp"
 #include "BrakeForce.hpp"
 #include "ChaseForce.hpp"
 #include "MapForce.hpp"
@@ -57,7 +58,7 @@ int main() {
 
     Shader skyShader;
     skyShader.loadFromFile("../Shaders/sky.vert", "../Shaders/sky.frag");
-    if(!heightmapShader.compile()){
+    if(!skyShader.compile()){
         return -1;
     }
 
@@ -89,17 +90,17 @@ int main() {
     {
         Model3DBufferPtr modBuffer(std::make_shared<Model3DBuffer>());
         VertexBuffer buffer;
-        buffer.addVertex(glm::vec3(-1, -1, 0), glm::vec3(0,0,0), glm::vec2(0,0));
-        buffer.addVertex(glm::vec3(-1, 1, 0), glm::vec3(0,0,0), glm::vec2(0,1));
-        buffer.addVertex(glm::vec3(1, 1, 0), glm::vec3(0,0,0), glm::vec2(1,1));
-        buffer.addVertex(glm::vec3(1, -1, 0), glm::vec3(0,0,0), glm::vec2(1,0));
-        buffer.addTriangle(0,1,2);
+        buffer.addVertex(glm::vec3(-1, -1, 0), glm::vec3(-100,200,0), glm::vec2(0,0));
+        buffer.addVertex(glm::vec3(-1, 1, 0), glm::vec3(-100,200,0), glm::vec2(0,1));
+        buffer.addVertex(glm::vec3(1, 1, 0), glm::vec3(-100,200,0), glm::vec2(1,1));
+        buffer.addVertex(glm::vec3(1, -1, 0), glm::vec3(-100,200,0), glm::vec2(1,0));
+        buffer.addTriangle(0,2,1);
         buffer.addTriangle(0,3,2);
         modBuffer->loadFromMemory(buffer);
         sky->addModelBuffer(modBuffer);
     }
     sky->setShader(&skyShader);
-    //renderer.registerModel(sky);
+    renderer.registerModel(sky);
 
     MaterialPtr snow(std::make_shared<Material>());
     snow->loadFromFile("../Resources/snow.bmp");
@@ -125,15 +126,16 @@ int main() {
     house->setScale({0.3,0.3,0.3});
     house->setPosition({25,0,-25});
     house->setRotation({0,-30,0});
-    MeshLoader::load(house.get(), "../Resources/house.obj");
-    renderer.registerModel(house);
-
     MeshLoader::MeshParams params;
-    params.color = glm::vec4(0,1,0,1);
-    params.scale = glm::vec3(0.3,0.3,0.3);
+    params.color = glm::vec4(174/255.f,100/255.f,45/255.f,1);
+    MeshLoader::load(house.get(), "../Resources/house.obj", params);
+    renderer.registerModel(house);
 
     std::vector<Model3DPtr> trees;
     trees.push_back(std::make_shared<Model3D>());
+
+    params.color = glm::vec4(0,1,0,1);
+    params.scale = glm::vec3(0.3,0.3,0.3);
     MeshLoader::load(trees[0].get(), "../Resources/FIR.3DS", params);
     trees[0]->setShader(&shader);
     renderer.registerModel(trees[0]);
@@ -155,8 +157,8 @@ int main() {
     trees[8]->setPosition({15,0,22});
     trees[9]->setPosition({3,0, -14});
     trees[10]->setPosition({5,0,3});
-    trees[11]->setPosition({9,0,8});
-    trees[12]->setPosition({3,0, 14});
+    trees[11]->setPosition({2,0,19});
+    trees[12]->setPosition({-16.5,10, -19.5});
     
     
 
@@ -178,7 +180,9 @@ int main() {
     for(int i = 0; i < 1; ++i){
         std::shared_ptr<Wolf> w(new Wolf);
         w->getModel()->setShader(&shader);
-        MeshLoader::load(w->getModel().get(), "../Resources/WOLF.3DS");
+        MeshLoader::MeshParams par;
+        par.color = glm::vec4(0.3,0.3,0.3,1);
+        MeshLoader::load(w->getModel().get(), "../Resources/WOLF.3DS", par);
         
         w->setPosition(glm::vec3(0,0,0));//glm::vec3(glm::linearRand(-10.f, 10.f),0,glm::linearRand(-10.f, 10.f)));
         w->setRotation(glm::vec3(-90,0,0));
@@ -191,11 +195,34 @@ int main() {
     for(auto s : entity.sheeps){
         ForcePtr f(new MapForce(s));
         sys.addForce(f);
+        for(auto& t: trees)
+        {
+            ForcePtr tf(new PointHookForce(s, t->getPosition(), 2, 2));
+            sys.addForce(tf);
+        }
+        ForcePtr pic1(new PointHookForce(s, glm::vec3(-8,0,-8), 2, 4));
+        ForcePtr pic2(new PointHookForce(s, glm::vec3(-16.5,0, -19.5), 2, 12));
+        ForcePtr houseFrc(new PointHookForce(s, glm::vec3(25,0,-25), 2, 4));
+        sys.addForce(pic1);
+        sys.addForce(pic2);
+        sys.addForce(houseFrc);
     }
 
     for(auto w : entity.wolves){
         ForcePtr f(new MapForce(w));
         sys.addForce(f);
+        for(auto& t: trees)
+        {
+            ForcePtr tf(new PointHookForce(w, t->getPosition(), 2, 2));
+            sys.addForce(tf);
+        }
+
+        ForcePtr pic1(new PointHookForce(w, glm::vec3(-8,0,-8), 2, 4));
+        ForcePtr pic2(new PointHookForce(w, glm::vec3(-16.5,0, -19.5), 2, 12));
+        ForcePtr houseFrc(new PointHookForce(w, glm::vec3(25,0,-25), 2, 4));
+        sys.addForce(pic1);
+        sys.addForce(pic2);
+        sys.addForce(houseFrc);
     }
 
     WolfIdleBehavior behav(entity);
@@ -262,14 +289,19 @@ int main() {
         if(InputState::get().isKeyPressed(SDLK_ESCAPE))
             done = true;
 
+        if(InputState::get().isKeyPressed(SDLK_a))
+            heightmap.getMesh()->getModelBuffer(0)->setWireframe(true);
+        if(InputState::get().isKeyPressed(SDLK_z))
+            heightmap.getMesh()->getModelBuffer(0)->setWireframe(false);
+
         camera->update(dt);
         heightmap.update(dt);
-        /*sys.update(dt);
+        sys.update(dt);
         for(auto& s : entity.sheeps)
             s->update(dt);
         for(auto& w : entity.wolves)
             w->update(dt);
-*/
+
         for(auto it = entity.sheeps.begin(); it < entity.sheeps.end(); ++it){
             if((*it)->getLife() < 0){
                 sys.removeParticle(*it);

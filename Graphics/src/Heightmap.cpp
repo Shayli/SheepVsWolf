@@ -261,7 +261,7 @@ void Heightmap::computeMapLODRecursive(QuadTree<float>* node)
 	glm::vec3 diff(nodePos - camPos);
 	float dist = (diff.x*diff.x + diff.y*diff.y + diff.z*diff.z) / (node->Depth*node->Depth*2);
 	glm::vec3 scale = m_mesh->getScale();
-	bool forceDraw = dist > (node->Size*scale.x * node->Size*scale.z * scale.y)+10000;
+	bool forceDraw = dist > (node->Size*scale.x * node->Size*scale.z * scale.y)+1000;
 	if (forceDraw) {
 		node->LOD = gdepth;
 		resetMapLODRecursive(node, gdepth);

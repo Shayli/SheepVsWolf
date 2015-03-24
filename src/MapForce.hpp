@@ -11,14 +11,13 @@ public:
 	MapForce(const AnimalPtr& a) : Force(a, nullptr){};
 	void update(float){
 		glm::vec3 pos = m_A->getPosition();
-		static const glm::vec3 right(Map::width/2, 0,0);
-		static const glm::vec3 top(Map::height/2, 0,0);
+		static const glm::vec3 right(32, 0,0);
+		static const glm::vec3 top(0,0,32);
 		static const float fK = 10;
-		static const float fL = 10;
-
+		static const float fL = 2;
 		{
 			// Right side
-			glm::vec3 dir = right-pos;
+			glm::vec3 dir = right-glm::vec3(pos.x,0,0);
 			float d = glm::length(dir);
 			if(d > 0.001f && d < fL) {
 				glm::vec3 f = fK * (1 - (fL/std::max(d, 0.001f))) * dir;
@@ -27,7 +26,7 @@ public:
 		}
 		{
 			// Left side
-			glm::vec3 dir = -(pos-right);
+			glm::vec3 dir = (-right-glm::vec3(pos.x,0,0));
 			float d = glm::length(dir);
 			if(d > 0.001f  && d < fL) {
 				glm::vec3 f = fK * (1 - (fL/std::max(d, 0.001f))) * dir;
@@ -36,7 +35,7 @@ public:
 		}
 		{
 			// Top side
-			glm::vec3 dir = top-pos;
+			glm::vec3 dir = top-glm::vec3(0,0,pos.z);
 			float d = glm::length(dir);
 			if(d > 0.001f && d < fL) {
 				glm::vec3 f = fK * (1 - (fL/std::max(d, 0.001f))) * dir;
@@ -45,7 +44,7 @@ public:
 		}
 		{
 			// Bottom side
-			glm::vec3 dir = -(pos - top);
+			glm::vec3 dir = (-top-glm::vec3(0,0,pos.z));
 			float d = glm::length(dir);
 			if(d > 0.001f  && d < fL) {
 				glm::vec3 f = fK * (1 - (fL/std::max(d, 0.001f))) * dir;
