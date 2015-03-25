@@ -18,7 +18,12 @@ bool load(Model3D* ptr, const std::string& file, const MeshParams& params)
         return false;
     }
 
-    
+    glm::mat4 rot = glm::rotate(glm::mat4(),glm::radians(params.rotation.x), glm::vec3(1,0,0));
+    rot = glm::rotate(rot,glm::radians(params.rotation.y), glm::vec3(0,1,0));
+    rot = glm::rotate(rot,glm::radians(params.rotation.z), glm::vec3(0,0,1));
+    glm::mat4 trans = glm::translate(glm::mat4(), params.translation);
+    glm::mat4 sca = glm::scale(glm::mat4(), params.scale);
+    glm::mat4 mat = trans*rot*sca;
     
     for(size_t c = 0; c < scene->mNumMeshes; ++c) {
         Model3DBufferPtr buffer(new Model3DBuffer);
@@ -37,8 +42,9 @@ bool load(Model3D* ptr, const std::string& file, const MeshParams& params)
                 aiVector3D normaltmp = m->mNormals[face.mIndices[j]];
                 glm::vec3 normal(normaltmp.x, normaltmp.y, normaltmp.z);
                 aiVector3D postmp = m->mVertices[face.mIndices[j]];
-                glm::vec3 pos(postmp.x*params.scale.x, postmp.y*params.scale.y, postmp.z*params.scale.z);
-                vbuffer.addVertex(pos, normal, uv, params.color);
+                glm::vec3 pos(postmp.x, postmp.y, postmp.z);
+                glm::vec4 tmppos = mat*glm::vec4(pos, 1);
+                vbuffer.addVertex({tmppos.x, tmppos.y,tmppos.z}, normal, uv, params.color);
             }
             vbuffer.addTriangle(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
         }

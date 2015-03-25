@@ -2,6 +2,7 @@
 
 #include <Particle.hpp>
 #include "Behavior/Behavior.hpp"
+#include <iostream>
 
 class Animal : public Particle
 {
@@ -30,8 +31,13 @@ public:
 	void update(float dt){
 		if(m_behav)
 			m_behav->update(*this, dt);
+
 		if(glm::length(m_velocity) > m_moveSpeed)
 			m_velocity = glm::normalize(m_velocity)*m_moveSpeed;
+
+		auto d = glm::normalize(m_velocity);
+		auto c = acos(glm::dot(d,{0,0,1}))*180/M_PI;
+		m_model->setRotation({0,c,0});
 	}
 
 	void setBehavior(Behavior* b){

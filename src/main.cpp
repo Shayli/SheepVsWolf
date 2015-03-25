@@ -32,7 +32,7 @@ static const Uint32 WINDOW_HEIGHT = 600;
 
 
 int main() {
-    WindowManager wm(WINDOW_WIDTH, WINDOW_HEIGHT, "Newton was a Geek");
+    WindowManager wm(WINDOW_WIDTH, WINDOW_HEIGHT, "SheepVsWolf");
     wm.setFramerate(30);
 
     srand(0);
@@ -162,14 +162,15 @@ int main() {
     
     
 
-    for(int i = 0; i < 3; ++i){
+    for(int i = 0; i < 15; ++i){
         std::shared_ptr<Sheep> s(new Sheep);
         s->getModel()->setShader(&shader);
-        MeshLoader::load(s->getModel().get(), "../Resources/SHEEP2.3DS");
+        MeshLoader::MeshParams params;
+        params.scale = glm::vec3(0.5,1,0.5);
+        params.rotation = glm::vec3(180,90,0);
+        MeshLoader::load(s->getModel().get(), "../Resources/SHEEP2.3DS", params);
         
         s->setPosition(glm::vec3(glm::linearRand(-10.f, 10.f),0,glm::linearRand(-10.f, 10.f)));
-        s->setRotation(glm::vec3(180,0,0));
-        s->setScale(glm::vec3(0.5,1,0.5));
 
         renderer.registerModel(s->getModel());
         sys.addParticle(s);
@@ -177,56 +178,56 @@ int main() {
     }
 
     
-    for(int i = 0; i < 1; ++i){
+    for(int i = 0; i < 3; ++i){
         std::shared_ptr<Wolf> w(new Wolf);
         w->getModel()->setShader(&shader);
-        MeshLoader::MeshParams par;
-        par.color = glm::vec4(0.3,0.3,0.3,1);
-        MeshLoader::load(w->getModel().get(), "../Resources/WOLF.3DS", par);
+        MeshLoader::MeshParams params;
+        params.rotation = glm::vec3(-90,0,0);
+        params.color = glm::vec4(0.3,0.3,0.3,1);
+        MeshLoader::load(w->getModel().get(), "../Resources/WOLF.3DS", params);
         
-        w->setPosition(glm::vec3(0,0,0));//glm::vec3(glm::linearRand(-10.f, 10.f),0,glm::linearRand(-10.f, 10.f)));
-        w->setRotation(glm::vec3(-90,0,0));
-        
+        w->setPosition(glm::vec3(glm::linearRand(-10.f, 10.f),0,glm::linearRand(-10.f, 10.f)));
         renderer.registerModel(w->getModel());
         sys.addParticle(w);
         entity.wolves.push_back(w);
     }
 
-    for(auto s : entity.sheeps){
+    for(auto& s : entity.sheeps){
         ForcePtr f(new MapForce(s));
         sys.addForce(f);
         for(auto& t: trees)
         {
-            ForcePtr tf(new PointHookForce(s, t->getPosition(), 2, 2));
+            ForcePtr tf(new PointHookForce(s, t->getPosition(), 2, 3));
             sys.addForce(tf);
         }
-        ForcePtr pic1(new PointHookForce(s, glm::vec3(-8,0,-8), 2, 4));
-        ForcePtr pic2(new PointHookForce(s, glm::vec3(-16.5,0, -19.5), 2, 12));
-        ForcePtr houseFrc(new PointHookForce(s, glm::vec3(25,0,-25), 2, 4));
+        ForcePtr pic1(new PointHookForce(s, glm::vec3(-8,0,-8), 4, 6));
+        ForcePtr pic2(new PointHookForce(s, glm::vec3(-16.5,0, -19.5), 4, 15));
+        ForcePtr houseFrc(new PointHookForce(s, glm::vec3(25,0,-25), 2, 6));
         sys.addForce(pic1);
         sys.addForce(pic2);
         sys.addForce(houseFrc);
     }
 
-    for(auto w : entity.wolves){
+    for(auto& w : entity.wolves){
         ForcePtr f(new MapForce(w));
         sys.addForce(f);
         for(auto& t: trees)
         {
-            ForcePtr tf(new PointHookForce(w, t->getPosition(), 2, 2));
+            ForcePtr tf(new PointHookForce(w, t->getPosition(), 2, 3));
             sys.addForce(tf);
         }
 
-        ForcePtr pic1(new PointHookForce(w, glm::vec3(-8,0,-8), 2, 4));
-        ForcePtr pic2(new PointHookForce(w, glm::vec3(-16.5,0, -19.5), 2, 12));
-        ForcePtr houseFrc(new PointHookForce(w, glm::vec3(25,0,-25), 2, 4));
+        ForcePtr pic1(new PointHookForce(w, glm::vec3(-8,0,-8), 4, 6));
+        ForcePtr pic2(new PointHookForce(w, glm::vec3(-16.5,0, -19.5), 4, 15));
+        ForcePtr houseFrc(new PointHookForce(w, glm::vec3(25,0,-25), 2, 6));
         sys.addForce(pic1);
         sys.addForce(pic2);
         sys.addForce(houseFrc);
     }
 
     WolfIdleBehavior behav(entity);
-    entity.wolves[0]->setBehavior(&behav);
+    for(auto& w : entity.wolves)
+        w->setBehavior(&behav);
 
     SheepIdleBehavior behav2(entity);
     for(auto& s : entity.sheeps)
@@ -297,8 +298,10 @@ int main() {
         camera->update(dt);
         heightmap.update(dt);
         sys.update(dt);
+
         for(auto& s : entity.sheeps)
             s->update(dt);
+
         for(auto& w : entity.wolves)
             w->update(dt);
 

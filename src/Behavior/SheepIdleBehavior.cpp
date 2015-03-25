@@ -26,6 +26,6 @@ void SheepIdleBehavior::update(Animal& a, float dt){
 
 	if(glm::length(near->getPosition()- a.getPosition()) < 1.f){
 		a.setLife(a.getLife()-1);
-		std::cout << "Life : " << a.getLife() << std::endl;
+		//std::cout << "Life : " << a.getLife() << std::endl;
 	}
 }

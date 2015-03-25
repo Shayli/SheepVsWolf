@@ -48,7 +48,7 @@ void Deferred::renderFrame()
         glViewport( 0, 0, width, height);
         screenQuad.draw();
 
-        // Debug
+        /* Debug
 		blit.bind();
 		glActiveTexture(GL_TEXTURE0);
         float subSize = 9.f;
@@ -87,7 +87,7 @@ void Deferred::renderFrame()
         glBindTexture(GL_TEXTURE_2D, postFxBuffer.getChannel(3));
         glViewport(8*width/subSize, 0, width/subSize, height/subSize);
         screenQuad.draw();
-        blit.unbind();
+        blit.unbind();*/
     }
 }
 
